@@ -1,0 +1,43 @@
+use faang;
+select * from amazon;
+select * from apple;
+select * from facebook;
+select * from google_class_a; 		
+select * from google_class_c;
+select * from netflix;
+
+-- adding new column 'company'
+alter table amazon add company text;
+update amazon set company = 'amazon';
+
+-- converting date into year and month
+SELECT DATE_FORMAT(date,'%Y-%m') AS date from amazon;
+update amazon set date = DATE_FORMAT(date,'%Y-%m');
+
+-- Showing top 5 months which has highest volume of FAANG 
+select company, date, sum(volume) as highest_volume from amazon group by date order by volume desc limit 5;
+select company, date, sum(volume) as highest_volume from apple group by date order by volume desc limit 5;
+select company, date, sum(volume) as highest_volume from facebook group by date order by volume desc limit 5;
+select company, date, sum(volume) as highest_volume from google_class_a group by date order by volume desc limit 5;
+select company, date, sum(volume) as highest_volume from google_class_c group by date order by volume desc limit 5;
+select company, date, sum(volume) as highest_volume from netflix group by date order by volume desc limit 5;
+
+-- Joining google class A and C to know the total volumes of Google for each year
+-- creating cte
+
+with google_class_AandC (company,date,volume)
+as (
+select company, date, sum(volume) as total_class_a from google_class_a group by date 
+union
+select company, date, sum(volume) as total_class_c  from google_class_c group by date
+)
+select left(date,4) AS date, company, volume from google_class_AandC order by volume desc;
+
+-- caculation profit percentage of google class A and C
+select sum(google_class_c.volume) / sum(google_class_a.volume )*100 as profitpercentage from google_class_a , google_class_c;
+
+-- Subtracting total volumes grouping by years to find Years where company has faced profit/loss and there percentage
+
+select company, left(date,4) as year, sum(volume) as total_volume, (sum(volume) - lag(sum(volume)) over(order by date)) as profit_or_loss,
+(sum(volume) - lag(sum(volume)) over(order by date)) / lag(sum(volume)) over(order by date) *100 as stock_percentage
+from netflix group by year;
