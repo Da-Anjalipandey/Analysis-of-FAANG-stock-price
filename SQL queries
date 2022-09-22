@@ -40,4 +40,4 @@ select sum(google_class_c.volume) / sum(google_class_a.volume )*100 as profitper
 
 select company, left(date,4) as year, sum(volume) as total_volume, (sum(volume) - lag(sum(volume)) over(order by date)) as profit_or_loss,
 (sum(volume) - lag(sum(volume)) over(order by date)) / lag(sum(volume)) over(order by date) *100 as stock_percentage
-from netflix group by year;
+from netflix group by year; -- This calculation is done for all the other compaines 
